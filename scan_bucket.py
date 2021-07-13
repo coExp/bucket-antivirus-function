@@ -57,6 +57,7 @@ def object_have_to_be_scanned(s3_client, s3_bucket_name, key_name):
         return True
     for tag in s3_object_tags["TagSet"]:
         if tag["Key"] in [AV_STATUS_METADATA] and tag["Value"] in [AV_STATUS_DO_NOT_SCAN]:
+            print("File skipped by tag `%s`\n" % AV_STATUS_METADATA)
             return False
     return True
 
