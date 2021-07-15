@@ -43,10 +43,23 @@ def get_objects(s3_client, s3_bucket_name):
         for key in s3_list_objects_result["Contents"]:
             key_name = key["Key"]
             # Don't include objects that have been scanned
-            if not object_previously_scanned(s3_client, s3_bucket_name, key_name):
+            if not object_previously_scanned(s3_client, s3_bucket_name, key_name) and \
+                object_have_to_be_scanned(s3_client, s3_bucket_name, key_name):
                 s3_object_list.append(key_name)
 
     return s3_object_list
+
+
+# Determine if an object have to be scanned
+def object_have_to_be_scanned(s3_client, s3_bucket_name, key_name):
+    s3_object_tags = s3_client.get_object_tagging(Bucket=s3_bucket_name, Key=key_name)
+    if "TagSet" not in s3_object_tags:
+        return True
+    for tag in s3_object_tags["TagSet"]:
+        if tag["Key"] in [AV_STATUS_METADATA] and tag["Value"] in [AV_STATUS_DO_NOT_SCAN]:
+            print("File skipped by tag `%s`\n" % AV_STATUS_METADATA)
+            return False
+    return True
 
 
 # Determine if an object has been previously scanned for viruses
