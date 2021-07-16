@@ -215,7 +215,7 @@ def lambda_handler(event, context):
     s3_object = event_object(event, event_source=EVENT_SOURCE)
 
     if not object_have_to_be_scanned(s3_client, s3_object):
-        set_av_tags(s3_client, s3_object, AV_STATUS_DO_NOT_SCAN, 'NC', get_timestamp())
+        set_av_tags(s3_client, s3_object, AV_STATUS_DO_NOT_SCAN, AV_SIGNATURE_UNKNOWN, get_timestamp())
         print(
             "Skipp of s3://%s file is tagged DO_NOT_SCAN \n"
             % (os.path.join(s3_object.bucket_name, s3_object.key))
